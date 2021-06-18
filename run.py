@@ -42,7 +42,6 @@ def validate_data(values):
     
     try:
         values_int = [int(value) for value in values]
-        print(values_int)
         if len(values_int) != 6: 
             raise ValueError(
                 f"Exactly 6 values required, you provided {(len(values_int))} values {values_int}"
@@ -52,6 +51,17 @@ def validate_data(values):
         return False
     return True    
 
+def update_sales_worksheet(data):
+    """
+    Update sales worksheet, add a new row with the list data provided.
+    """
+    print("Updating sales workes...\n")
+    sales_worksheet = SHEET.worksheet("sales")
+    sales_worksheet.append_row(data)
+    print("sales worksheet updated successfully.\n")
 
 data = get_sales_data()
+sales_data = [int(num)for num in data]
+print(sales_data)
+update_sales_worksheet(sales_data)
 
