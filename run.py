@@ -1,5 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
+from pprint import pprint
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -16,7 +17,7 @@ SHEET = GSPREAD_CLIENT.open('love_sandwiches')
 def get_sales_data():
     """
     Get sales figures input from the user
-    """ 
+    """
     while True:
 
         print("Please enter sales data from last market.")
@@ -24,7 +25,7 @@ def get_sales_data():
         print("Example: 10,20,30,40,50,60\n")
 
         data_str = input("Enter your data here:")
-    
+
         sales_data = data_str.split(",")
 
         if validate_data(sales_data):
@@ -39,17 +40,18 @@ def validate_data(values):
     Raises valueError if strings cannot be converted into int,
     or if there aren't exactly 6 values.
     """
-    
+
     try:
         values_int = [int(value) for value in values]
-        if len(values_int) != 6: 
+        if len(values_int) != 6:
             raise ValueError(
-                f"Exactly 6 values required, you provided {(len(values_int))} values {values_int}"
+                f"Exactly 6 values required, you provided {(len(values_int))}values {values_int}"
             )
     except ValueError as e:
         print(f"Invalid data: {e}, please try again.\n")
         return False
-    return True    
+    return True
+
 
 def update_sales_worksheet(data):
     """
@@ -60,8 +62,31 @@ def update_sales_worksheet(data):
     sales_worksheet.append_row(data)
     print("sales worksheet updated successfully.\n")
 
-data = get_sales_data()
-sales_data = [int(num)for num in data]
-print(sales_data)
-update_sales_worksheet(sales_data)
 
+def calculate_surplus_data(sales_row):
+    """
+    compare sales with stock and calculate the surpluse for each item type.
+
+    Th surplse is defined as the sales figure subsracted from stock.
+    - Posive surpluse indicates waste.
+    - Negative surpluse indicates extra made when stock was sold out.
+    """
+    print("Calulating surplus data...\n")
+    stock = SHEET.worksheet("stock").get_all_values()
+    stock_row = stock[-1]
+    print(stock_row)
+
+
+def main():
+    """
+    Run all program functions
+    """
+    data = get_sales_data()
+    sales_data = [int(num)for num in data]
+    print(sales_data)
+    update_sales_worksheet(sales_data)
+    calculate_surplus_data(sales_data)
+
+
+print("Welcom to love Sandwiches Data Automation\n")
+main()
